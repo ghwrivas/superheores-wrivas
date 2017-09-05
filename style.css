@@ -1,0 +1,52 @@
+body {
+  font-family: "Comic Sans MS", cursive, sans-serif;
+}
+
+body div {
+  width: 100%;
+  height: auto;
+}
+
+.div-input {
+  float: left;
+  margin: 10px;
+  padding: 10px;
+  max-width: 200px;
+  border: 1px solid black;
+  min-height: 50px;
+}
+
+.input-text {
+  width: 100%;
+  height: 20px;
+}
+
+.input-select {
+  width: 100%;
+  height: 20px;
+}
+
+.input-button {
+  height: 30px;
+  background-color: #2196F3;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  width: 100%;
+  margin-top: 10px;
+  font-size: initial;
+  font-weight: bolder;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    border: 1px solid #ddd;
+}
+
+th, td {
+    border: none;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even){background-color: #f2f2f2}

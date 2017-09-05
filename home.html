@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Superheroes - wrivas</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+<script src="main.js"></script>
+</head>
+<body>
+
+  <header>
+    <div id="div-form">
+      <form id="input-form" onsubmit="return toSubmit(this);">
+        <div class="div-input">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" class="input-text" placeholder="Name" pattern="[A-Za-z0-9]{1,60}" title="no more than 60 characters, letters or numbers" required />
+        </div>
+        <div class="div-input">
+          <label for="weapon">Weapon</label>
+          <input id="weapon" name="weapon" class="input-text" type="text" placeholder="Weapon" pattern="[A-Za-z]{1,60}" title="no more than 60 characters, only letters" required/>
+        </div>
+        <div class="div-input">
+          <label for="occupation">Occupation</label>
+          <input id="occupation" name="occupation" class="input-text" type="text" placeholder="Occupation" pattern="[A-Za-z]{1,70}" title="no more than 70 characters, only letters" required/>
+        </div>
+        <div class="div-input">
+          <label for="debt">Debt</label>
+          <select id="debt" name="debt" class="input-select" >
+            <option value="true">Yes</option>
+            <option value="false" selected>No</option>
+          </select>
+        </div>
+        <div class="div-input">
+          <input name="send" class="input-button" type="submit">
+        </div>
+
+      </form>
+    </div>
+  </header>
+  <article>
+    <div style="overflow-x:auto;">
+      <table id="personajes">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Weapon</th>
+            <th>Occupation</th>
+            <th>Debt</th>
+            <th>Actions</th>
+          </tr>
+        <thead>
+        <tbody id="tbody-personajes"></tbody>
+      </table>
+    </div>
+  </article>
+  <footer>
+
+  </footer>
+</body>
+</html>
