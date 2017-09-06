@@ -61,21 +61,40 @@ function populatelist(personajes){
     row.insertCell(1).innerHTML = personajes[i].weapon;
     row.insertCell(2).innerHTML = personajes[i].occupation;
     row.insertCell(3).innerHTML = personajes[i].debt ? 'Yes' : 'No';
-    row.insertCell(4).appendChild(createDeleteLink(personajes[i].id));
+    var cell = row.insertCell(4);
+    cell.appendChild(createDeleteLink(personajes[i].id));
+    cell.appendChild(createEditLink());
   }
+}
 
+function  getRow(element) {
+    alert("row" + element.parentNode.parentNode.rowIndex +
+    " - column" + element.parentNode.cellIndex);
+}
+
+function createEditLink(){
+  var x = document.createElement("A");
+  x.setAttribute("href", "#");
+  x.setAttribute("onclick", 'getRow(this)');
+
+  var i = document.createElement("IMG");
+  i.setAttribute("src", "https://cdn2.iconfinder.com/data/icons/snipicons/500/edit-24.png");
+  i.setAttribute("alt", "Edit item");
+  i.setAttribute("title", "Edit item");
+  x.appendChild(i);
+
+  return x;
 }
 
 function createDeleteLink(id){
   var x = document.createElement("A");
-  //var t = document.createTextNode("Delete");
   x.setAttribute("href", "#");
   x.setAttribute("onclick", `deleteItem(${id}, showMessage)`);
-  //x.appendChild(t);
 
   var i = document.createElement("IMG");
   i.setAttribute("src", "https://cdn0.iconfinder.com/data/icons/ikooni-outline-free-basic/128/free-27-24.png");
   i.setAttribute("alt", "Delete item");
+  i.setAttribute("title", "Delete item");
   x.appendChild(i);
 
   return x;
