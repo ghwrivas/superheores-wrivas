@@ -1,4 +1,4 @@
-var url_api = 'https://ironhack-characters.herokuapp.com/characters';
+var $http = http();
 
 var rowEditSelected;
 
@@ -42,15 +42,6 @@ function toSubmit(form){
   return false;
 }
 
-function deleteForPut(url) {
-  var myHeader = new Headers();
-  var myInit = {
-    method: 'DELETE',
-    headers: myHeader
-  };
-  return fetch(url, myInit).then((response) => [{'message':response}]);
-}
-
 function toSubmitUpdate(form){
   let editSuperHeroe = {
     name: rowEditSelected.row.cells[0].querySelector('input').value,
@@ -81,18 +72,6 @@ function toSubmitUpdate(form){
       showOverlay(false)
   });
   return false;
-}
-
-function getPersonajes() {
-  return get(url_api).then(
-    (dataEnJson) => {
-      let arrayPersonajes = [];
-      dataEnJson.forEach(data => {
-        arrayPersonajes.push(Object.assign({}, data))
-      })
-      return arrayPersonajes;
-    }
-  );
 }
 
 function populatelist(personajes){
@@ -274,43 +253,6 @@ function deleteItem(id, callback) {
     var url = "https://ironhack-characters.herokuapp.com/characters/" + id;
     return remove(url, callback);
   }
-}
-
-function remove(url, callback) {
-  showOverlay(true);
-  var httpRequest = new XMLHttpRequest();
-  httpRequest.open("DELETE", url);
-  httpRequest.onreadystatechange = (response) => {
-    if (httpRequest.readyState === 4 || httpRequest.readyState === 200) {
-      callback(httpRequest.responseText);
-      getPersonajes().then(function(personajes){
-        populatelist(personajes);
-        showOverlay(false);
-      });
-    }
-  }
-  httpRequest.send();
-}
-
-function get(url) {
-  var myHeader = new Headers();
-  var myInit = {
-    method: 'GET',
-    headers: myHeader
-  };
-  return fetch(url, myInit).then((response) => response.json());
-}
-
-function post(data, url) {
-  var myHeader = new Headers();
-  myHeader.append('Content-Type', 'application/json');
-  var datos = JSON.stringify(data);
-  var myInit = {
-    method: 'POST',
-    headers: myHeader,
-    body: datos
-  };
-  return fetch(url, myInit);
 }
 
 function showMessage(message, error){
