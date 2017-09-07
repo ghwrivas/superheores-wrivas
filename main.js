@@ -42,6 +42,15 @@ function toSubmit(form){
   return false;
 }
 
+function deleteForPut(url) {
+  var myHeader = new Headers();
+  var myInit = {
+    method: 'DELETE',
+    headers: myHeader
+  };
+  return fetch(url, myInit).then((response) => [{'message':response}]);
+}
+
 function toSubmitUpdate(form){
   let editSuperHeroe = {
     name: rowEditSelected.row.cells[0].querySelector('input').value,
@@ -50,26 +59,27 @@ function toSubmitUpdate(form){
     debt: rowEditSelected.row.cells[3].querySelector('select').value
   };
   showOverlay(true);
-  remove("https://ironhack-characters.herokuapp.com/characters/" + rowEditSelected.id, function(){});
-  post(editSuperHeroe, url_api).then(function(response){
-     if(response.status == 201){ //created
-       localStorage.setItem('superheroe', JSON.stringify(editSuperHeroe))
-       showMessage(`${editSuperHeroe.name} updated`)
-       reset()
-       getPersonajes().then(function(personajes){
-         populatelist(personajes)
-       });
-       return null;
-     }else if(response.status == 400){
-       return response.json();
-     }
-  }).catch(function(e){
-     showMessage(e.message, true)
+  deleteForPut('https://ironhack-characters.herokuapp.com/characters/' + rowEditSelected.id)
+  .then(function(result){
+    post(editSuperHeroe, url_api).then(function(response){
+      console.log(response)
+       if(response.status == 201){ //created
+         localStorage.setItem('superheroe', JSON.stringify(editSuperHeroe))
+         showMessage(`${editSuperHeroe.name} updated`)
+         reset()
+         getPersonajes().then(function(personajes){
+           populatelist(personajes)
+         });
+         return null;
+       }else if(response.status == 400){
+         return response.json();
+       }
+    });
   }).then(function (badData){
-     if(badData)
-      showMessage(badData.error, true);
+       if(badData)
+        showMessage(badData.error, true);
   }).then(function(){
-     showOverlay(false)
+       showOverlay(false)
   });
   return false;
 }
