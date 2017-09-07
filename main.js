@@ -1,5 +1,7 @@
 var url_api = 'https://ironhack-characters.herokuapp.com/characters';
 
+var rowEditSelected;
+
 var newSuperHeroe = {
   id: 1,
   name: '',
@@ -40,6 +42,38 @@ function toSubmit(form){
   return false;
 }
 
+function toSubmitUpdate(form){
+  let editSuperHeroe = {
+    name: rowEditSelected.row.cells[0].querySelector('input').value,
+    weapon: rowEditSelected.row.cells[1].querySelector('input').value,
+    occupation: rowEditSelected.row.cells[2].querySelector('input').value,
+    debt: rowEditSelected.row.cells[3].querySelector('select').value
+  };
+  showOverlay(true);
+  remove("https://ironhack-characters.herokuapp.com/characters/" + rowEditSelected.id, function(){});
+  post(editSuperHeroe, url_api).then(function(response){
+     if(response.status == 201){ //created
+       localStorage.setItem('superheroe', JSON.stringify(editSuperHeroe))
+       showMessage(`${editSuperHeroe.name} updated`)
+       reset()
+       getPersonajes().then(function(personajes){
+         populatelist(personajes)
+       });
+       return null;
+     }else if(response.status == 400){
+       return response.json();
+     }
+  }).catch(function(e){
+     showMessage(e.message, true)
+  }).then(function (badData){
+     if(badData)
+      showMessage(badData.error, true);
+  }).then(function(){
+     showOverlay(false)
+  });
+  return false;
+}
+
 function getPersonajes() {
   return get(url_api).then(
     (dataEnJson) => {
@@ -58,7 +92,7 @@ function populatelist(personajes){
   for(let i = 0; i < personajes.length; i++){
     let row = tbody.insertRow();
 
-    let cell0 = row.insertCell(0); 
+    let cell0 = row.insertCell(0);
     let inputName = document.forms[0].querySelector('input[name="name"]');
     let inputNameCloned = inputName.cloneNode(true);
     inputNameCloned.value = personajes[i].name;
@@ -88,8 +122,13 @@ function populatelist(personajes){
     let inputDebt = document.forms[0].querySelector('select[name="debt"]');
     let inputDebtCloned = inputDebt.cloneNode(true);
     inputDebtCloned.value = personajes[i].debt;
+
+    console.log(inputDebtCloned.options[0].value)
+    console.log(inputDebtCloned.options[1].value)
+    inputDebtCloned.options[0].selected = inputDebtCloned.options[0].value == inputDebtCloned.value ? true : false;
+    inputDebtCloned.options[1].selected = inputDebtCloned.options[1].value == inputDebtCloned.value ? true : false;
     inputDebtCloned.style.display = 'none';
-    let label = personajes[i].debt ? 'Yes' : 'No';
+    let label = personajes[i].debt == 'true' ? 'Yes' : 'No';
     cell3.innerHTML = '<span>'+label+'</span>';
     cell3.appendChild(inputDebtCloned);
 
@@ -98,24 +137,24 @@ function populatelist(personajes){
     cell.appendChild(createDeleteLink(personajes[i].id));
     cell.appendChild(createEditLink(personajes[i].id));
     cell.appendChild(createUpdateButton());
+    cell.appendChild(createCancelUpdateLink(personajes[i].id))
   }
 }
 
 function  editItem(element, id) {
-  var rowSelected = element.parentNode.parentNode.rowIndex;
+  var rowSelected = element.parentNode.parentNode;
 
   document.querySelectorAll("table tbody tr").forEach(function(e){
 
-    if(rowSelected == e.rowIndex){
-      console.log(e.rowIndex + ' ' + rowSelected)
-      console.log(e.cells[0])
+    if(rowSelected.rowIndex == e.rowIndex){
+
       e.cells[0].querySelector('span').style.display = 'none';
       e.cells[1].querySelector('span').style.display = 'none';
       e.cells[2].querySelector('span').style.display = 'none';
       e.cells[3].querySelector('span').style.display = 'none';
-      
+
       for(let a of e.cells[4].querySelectorAll('a')){
-        a.style.display = 'none'
+        a.style.display = a.id != 'cancel-edit' ? 'none' : 'inline'
       }
 
       e.cells[0].querySelector('input').style.display = 'block';
@@ -128,9 +167,36 @@ function  editItem(element, id) {
       e.cells[1].querySelector('span').style.display = 'block';
       e.cells[2].querySelector('span').style.display = 'block';
       e.cells[3].querySelector('span').style.display = 'block';
-      
+
       for(let a of e.cells[4].querySelectorAll('a')){
-        a.style.display = 'inline'
+        a.style.display = a.id != 'cancel-edit' ? 'inline' : 'none'
+      }
+
+      e.cells[0].querySelector('input').style.display = 'none';
+      e.cells[1].querySelector('input').style.display = 'none';
+      e.cells[2].querySelector('input').style.display = 'none';
+      e.cells[3].querySelector('select').style.display = 'none';
+      e.cells[4].querySelector('input').style.display = 'none';
+    }
+
+    rowEditSelected = {'id': id, 'row':rowSelected};
+  });
+
+}
+
+function  cancelEdit(element, id) {
+  var rowSelected = element.parentNode.parentNode.rowIndex;
+
+  document.querySelectorAll("table tbody tr").forEach(function(e){
+
+    if(rowSelected == e.rowIndex){
+      e.cells[0].querySelector('span').style.display = 'block';
+      e.cells[1].querySelector('span').style.display = 'block';
+      e.cells[2].querySelector('span').style.display = 'block';
+      e.cells[3].querySelector('span').style.display = 'block';
+
+      for(let a of e.cells[4].querySelectorAll('a')){
+        a.style.display = a.id != 'cancel-edit' ? 'inline' : 'none'
       }
 
       e.cells[0].querySelector('input').style.display = 'none';
@@ -144,12 +210,21 @@ function  editItem(element, id) {
 
 }
 
-
 function createUpdateButton(){
   var x = document.createElement("input");
   x.setAttribute("type", "submit");
   x.setAttribute("class", "input-button");
   x.setAttribute("style", "display: none;");
+  return x;
+}
+
+function createCancelUpdateLink(id){
+  var x = document.createElement("A");
+  x.setAttribute("href", "#");
+  x.setAttribute("onclick", `cancelEdit(this, ${id})`);
+  x.innerHTML = 'Cancel'
+  x.setAttribute('id', 'cancel-edit')
+  x.style.display = 'none'
   return x;
 }
 
