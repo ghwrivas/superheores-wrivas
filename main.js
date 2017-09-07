@@ -59,10 +59,9 @@ function toSubmitUpdate(form){
     debt: rowEditSelected.row.cells[3].querySelector('select').value
   };
   showOverlay(true);
-  deleteForPut('https://ironhack-characters.herokuapp.com/characters/' + rowEditSelected.id)
+  deleteForPut(url_api + '/' + rowEditSelected.id)
   .then(function(result){
     post(editSuperHeroe, url_api).then(function(response){
-      console.log(response)
        if(response.status == 201){ //created
          localStorage.setItem('superheroe', JSON.stringify(editSuperHeroe))
          showMessage(`${editSuperHeroe.name} updated`)
@@ -76,10 +75,10 @@ function toSubmitUpdate(form){
        }
     });
   }).then(function (badData){
-       if(badData)
-        showMessage(badData.error, true);
+    if(badData)
+      showMessage(badData.error, true);
   }).then(function(){
-       showOverlay(false)
+      showOverlay(false)
   });
   return false;
 }
@@ -133,8 +132,6 @@ function populatelist(personajes){
     let inputDebtCloned = inputDebt.cloneNode(true);
     inputDebtCloned.value = personajes[i].debt;
 
-    console.log(inputDebtCloned.options[0].value)
-    console.log(inputDebtCloned.options[1].value)
     inputDebtCloned.options[0].selected = inputDebtCloned.options[0].value == inputDebtCloned.value ? true : false;
     inputDebtCloned.options[1].selected = inputDebtCloned.options[1].value == inputDebtCloned.value ? true : false;
     inputDebtCloned.style.display = 'none';
