@@ -18,15 +18,15 @@
       <form id="input-form" onsubmit="return toSubmit(this);">
         <div class="div-input">
           <label for="name">Name</label>
-          <input id="name" name="name" type="text" class="input-text" placeholder="Name" pattern="[A-Za-z0-9]{1,60}" title="no more than 60 characters, letters or numbers" required />
+          <input id="name" name="name" type="text" class="input-text" placeholder="Name" pattern="[A-Za-z0-9\s]{1,60}" title="no more than 60 characters, letters or numbers" required />
         </div>
         <div class="div-input">
           <label for="weapon">Weapon</label>
-          <input id="weapon" name="weapon" class="input-text" type="text" placeholder="Weapon" pattern="[A-Za-z]{1,60}" title="no more than 60 characters, only letters" required/>
+          <input id="weapon" name="weapon" class="input-text" type="text" placeholder="Weapon" pattern="[A-Za-z\s]{1,60}" title="no more than 60 characters, only letters" required/>
         </div>
         <div class="div-input">
           <label for="occupation">Occupation</label>
-          <input id="occupation" name="occupation" class="input-text" type="text" placeholder="Occupation" pattern="[A-Za-z]{1,70}" title="no more than 70 characters, only letters" required/>
+          <input id="occupation" name="occupation" class="input-text" type="text" placeholder="Occupation" pattern="[A-Za-z\s]{1,70}" title="no more than 70 characters, only letters" required/>
         </div>
         <div class="div-input">
           <label for="debt">Debt</label>
@@ -44,6 +44,7 @@
   </header>
   <article>
     <div style="overflow-x:auto;">
+    <form id="edit-form" onsubmit="return toSubmit(this);">
       <table id="personajes">
         <thead>
           <tr>
@@ -53,9 +54,10 @@
             <th>Debt</th>
             <th>Actions</th>
           </tr>
-        <thead>
+        </thead>
         <tbody id="tbody-personajes"></tbody>
       </table>
+      </form>
     </div>
   </article>
   <footer>

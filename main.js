@@ -15,7 +15,7 @@ function reset(){
   }
 }
 
-function toSubmit(){
+function toSubmit(form){
   showOverlay(true);
   post(newSuperHeroe, url_api).then(function(response){
      if(response.status == 201){ //created
@@ -56,26 +56,107 @@ function populatelist(personajes){
   clearList();
   var tbody = document.getElementById("tbody-personajes");
   for(let i = 0; i < personajes.length; i++){
-    var row = tbody.insertRow();
-    row.insertCell(0).innerHTML = personajes[i].name;
-    row.insertCell(1).innerHTML = personajes[i].weapon;
-    row.insertCell(2).innerHTML = personajes[i].occupation;
-    row.insertCell(3).innerHTML = personajes[i].debt ? 'Yes' : 'No';
-    var cell = row.insertCell(4);
+    let row = tbody.insertRow();
+
+    let cell0 = row.insertCell(0); 
+    let inputName = document.forms[0].querySelector('input[name="name"]');
+    let inputNameCloned = inputName.cloneNode(true);
+    inputNameCloned.value = personajes[i].name;
+    inputNameCloned.style.display = 'none';
+    cell0.innerHTML = '<span>'+personajes[i].name+'</span>';
+    cell0.appendChild(inputNameCloned);
+
+
+    let cell1 = row.insertCell(1);
+    let inputWeapon = document.forms[0].querySelector('input[name="weapon"]');
+    let inputWeaponCloned = inputWeapon.cloneNode(true);
+    inputWeaponCloned.value = personajes[i].weapon;
+    inputWeaponCloned.style.display = 'none';
+    cell1.innerHTML = '<span>'+personajes[i].weapon+'</span>';
+    cell1.appendChild(inputWeaponCloned);
+
+
+    let cell2 = row.insertCell(2);
+    let inputOcc = document.forms[0].querySelector('input[name="occupation"]');
+    let inputOccCloned = inputOcc.cloneNode(true);
+    inputOccCloned.value = personajes[i].occupation;
+    inputOccCloned.style.display = 'none';
+    cell2.innerHTML = '<span>'+personajes[i].occupation+'</span>';
+    cell2.appendChild(inputOccCloned);
+
+    let cell3 = row.insertCell(3);
+    let inputDebt = document.forms[0].querySelector('select[name="debt"]');
+    let inputDebtCloned = inputDebt.cloneNode(true);
+    inputDebtCloned.value = personajes[i].debt;
+    inputDebtCloned.style.display = 'none';
+    let label = personajes[i].debt ? 'Yes' : 'No';
+    cell3.innerHTML = '<span>'+label+'</span>';
+    cell3.appendChild(inputDebtCloned);
+
+
+    let cell = row.insertCell(4);
     cell.appendChild(createDeleteLink(personajes[i].id));
-    cell.appendChild(createEditLink());
+    cell.appendChild(createEditLink(personajes[i].id));
+    cell.appendChild(createUpdateButton());
   }
 }
 
-function  getRow(element) {
-    alert("row" + element.parentNode.parentNode.rowIndex +
-    " - column" + element.parentNode.cellIndex);
+function  editItem(element, id) {
+  var rowSelected = element.parentNode.parentNode.rowIndex;
+
+  document.querySelectorAll("table tbody tr").forEach(function(e){
+
+    if(rowSelected == e.rowIndex){
+      console.log(e.rowIndex + ' ' + rowSelected)
+      console.log(e.cells[0])
+      e.cells[0].querySelector('span').style.display = 'none';
+      e.cells[1].querySelector('span').style.display = 'none';
+      e.cells[2].querySelector('span').style.display = 'none';
+      e.cells[3].querySelector('span').style.display = 'none';
+      
+      for(let a of e.cells[4].querySelectorAll('a')){
+        a.style.display = 'none'
+      }
+
+      e.cells[0].querySelector('input').style.display = 'block';
+      e.cells[1].querySelector('input').style.display = 'block';
+      e.cells[2].querySelector('input').style.display = 'block';
+      e.cells[3].querySelector('select').style.display = 'block';
+      e.cells[4].querySelector('input').style.display = 'block';
+    }else{
+      e.cells[0].querySelector('span').style.display = 'block';
+      e.cells[1].querySelector('span').style.display = 'block';
+      e.cells[2].querySelector('span').style.display = 'block';
+      e.cells[3].querySelector('span').style.display = 'block';
+      
+      for(let a of e.cells[4].querySelectorAll('a')){
+        a.style.display = 'inline'
+      }
+
+      e.cells[0].querySelector('input').style.display = 'none';
+      e.cells[1].querySelector('input').style.display = 'none';
+      e.cells[2].querySelector('input').style.display = 'none';
+      e.cells[3].querySelector('select').style.display = 'none';
+      e.cells[4].querySelector('input').style.display = 'none';
+    }
+
+  });
+
 }
 
-function createEditLink(){
+
+function createUpdateButton(){
+  var x = document.createElement("input");
+  x.setAttribute("type", "submit");
+  x.setAttribute("class", "input-button");
+  x.setAttribute("style", "display: none;");
+  return x;
+}
+
+function createEditLink(id){
   var x = document.createElement("A");
   x.setAttribute("href", "#");
-  x.setAttribute("onclick", 'getRow(this)');
+  x.setAttribute("onclick", `editItem(this, ${id})`);
 
   var i = document.createElement("IMG");
   i.setAttribute("src", "https://cdn2.iconfinder.com/data/icons/snipicons/500/edit-24.png");
