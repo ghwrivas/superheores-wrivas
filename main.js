@@ -2,13 +2,6 @@ var $api = api();
 
 var rowEditSelected;
 
-function reset(){
-  let inputs = document.forms[0].querySelectorAll('.input-text,.input-select');
-  for(let input of inputs){
-    input.value = input.name != 'debt' ? '' : false;
-  }
-}
-
 function toSubmit(form){
   let inputs = form.querySelectorAll('.input-text,.input-select');
   let newSuperHeroe = {}
@@ -16,7 +9,7 @@ function toSubmit(form){
     newSuperHeroe[input.name] = input.value
   }
   showOverlay(true);
-  $api. save(newSuperHeroe).then(function(response){
+  $api.save(newSuperHeroe).then(function(response){
      if(response.status == 201){ //created
        localStorage.setItem('superheroe', JSON.stringify(newSuperHeroe))
        showMessage(`${newSuperHeroe.name} added to list`)
@@ -47,14 +40,13 @@ function toSubmitUpdate(form){
     debt: rowEditSelected.row.cells[3].querySelector('select').value
   };
   showOverlay(true);
-  deleteForPut(url_api + '/' + rowEditSelected.id)
-  .then(function(result){
-    post(editSuperHeroe, url_api).then(function(response){
+  $api.remove(rowEditSelected.id).then(function(result){
+    $api.save(editSuperHeroe).then(function(response){
        if(response.status == 201){ //created
          localStorage.setItem('superheroe', JSON.stringify(editSuperHeroe))
          showMessage(`${editSuperHeroe.name} updated`)
          reset()
-         getPersonajes().then(function(personajes){
+         $api.list().then(function(personajes){
            populatelist(personajes)
          });
          return null;
@@ -239,22 +231,15 @@ function createDeleteLink(id){
   return x;
 }
 
-function clearList(){
-  document.querySelectorAll("table tbody tr").forEach(function(e){
-    e.remove()
-  });
-}
-
 function deleteItem(id, callback) {
   if(confirm('Are you sure?')){
     showOverlay(true)
     $api.remove(id).then(function(response){
-      console.log(response)
       $api.list().then(function(personajes){
         populatelist(personajes)
       })
       return response
-    }).then(function(response){ 
+    }).then(function(response){
       callback(response)
     }).then(function(){
       showOverlay(false)
@@ -262,13 +247,22 @@ function deleteItem(id, callback) {
   }
 }
 
+function reset(){
+  let inputs = document.forms[0].querySelectorAll('.input-text,.input-select');
+  for(let input of inputs){
+    input.value = input.name != 'debt' ? '' : false;
+  }
+}
+
+function clearList(){
+  document.querySelectorAll("table tbody tr").forEach(e => e.remove());
+}
+
 function showMessage(message, error){
-  var x = document.getElementById('snackbar')
+  let x = document.getElementById('snackbar')
   x.innerHTML = message;
   x.className = error ? 'showError' : 'showSuccess';
-  setTimeout(()=>{
-    x.className = ''
-  }, 3000);
+  setTimeout(() => x.className = '', 3000);
 }
 
 function showOverlay(show){
@@ -283,7 +277,6 @@ window.onload = function(){
   let inputs = document.forms[0].querySelectorAll('.input-text,.input-select');
   let cache = JSON.parse(localStorage.getItem('superheroe'))
   for(let input of inputs){
-    let value;
     if(cache){
       input.value = cache[input.name];
     }else{
