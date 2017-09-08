@@ -21,7 +21,7 @@ var http = function(){
     return fetch(url, {
       method: 'DELETE',
       headers: new Headers()
-    }).then((response) => [{'message':response}]);
+    }).then((response) => response.text());
   }
 
   return {

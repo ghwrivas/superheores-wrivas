@@ -1,30 +1,27 @@
-var $http = http();
+var $api = api();
 
 var rowEditSelected;
 
-var newSuperHeroe = {
-  id: 1,
-  name: '',
-  occupation: '',
-  weapon: '',
-  debt: false
-};
-
 function reset(){
-  let inputs = document.querySelectorAll('.input-text,.input-select');
+  let inputs = document.forms[0].querySelectorAll('.input-text,.input-select');
   for(let input of inputs){
     input.value = input.name != 'debt' ? '' : false;
   }
 }
 
 function toSubmit(form){
+  let inputs = form.querySelectorAll('.input-text,.input-select');
+  let newSuperHeroe = {}
+  for(let input of inputs){
+    newSuperHeroe[input.name] = input.value
+  }
   showOverlay(true);
-  post(newSuperHeroe, url_api).then(function(response){
+  $api. save(newSuperHeroe).then(function(response){
      if(response.status == 201){ //created
        localStorage.setItem('superheroe', JSON.stringify(newSuperHeroe))
        showMessage(`${newSuperHeroe.name} added to list`)
        reset()
-       getPersonajes().then(function(personajes){
+       $api.list().then(function(personajes){
          populatelist(personajes)
        });
        return null;
@@ -250,8 +247,18 @@ function clearList(){
 
 function deleteItem(id, callback) {
   if(confirm('Are you sure?')){
-    var url = "https://ironhack-characters.herokuapp.com/characters/" + id;
-    return remove(url, callback);
+    showOverlay(true)
+    $api.remove(id).then(function(response){
+      console.log(response)
+      $api.list().then(function(personajes){
+        populatelist(personajes)
+      })
+      return response
+    }).then(function(response){ 
+      callback(response)
+    }).then(function(){
+      showOverlay(false)
+    })
   }
 }
 
@@ -259,44 +266,9 @@ function showMessage(message, error){
   var x = document.getElementById('snackbar')
   x.innerHTML = message;
   x.className = error ? 'showError' : 'showSuccess';
-  setTimeout(function(){
-    x.className = x.className.replace('show', '');
+  setTimeout(()=>{
+    x.className = ''
   }, 3000);
-}
-
-window.onload = function(){
-  var inputs = document.querySelectorAll('.input-text,.input-select');
-
-  for(let input of inputs){
-    input.addEventListener('change', function(e){
-      newSuperHeroe[e.target.name] = e.target.value;
-    })
-  }
-
-  loadCache();
-  showOverlay(true);
-  getPersonajes().then(function(personajes){
-    populatelist(personajes);
-    showOverlay(false);
-  });
-}
-
-/*
- * Reset form
-*/
-function loadCache(){
-  let inputs = document.querySelectorAll('.input-text,.input-select');
-  let cache = JSON.parse(localStorage.getItem('superheroe'))
-  for(let input of inputs){
-    let value;
-    if(cache){
-      value = cache[input.name];
-    }else{
-      value = input.name != 'debt' ? '' : false;
-    }
-    newSuperHeroe[input.name] = value;
-    input.value = value;
-  }
 }
 
 function showOverlay(show){
@@ -305,4 +277,22 @@ function showOverlay(show){
   }else{
     document.getElementById("overlay").style.display = "none";
   }
+}
+
+window.onload = function(){
+  let inputs = document.forms[0].querySelectorAll('.input-text,.input-select');
+  let cache = JSON.parse(localStorage.getItem('superheroe'))
+  for(let input of inputs){
+    let value;
+    if(cache){
+      input.value = cache[input.name];
+    }else{
+      input.value = input.name != 'debt' ? '' : false;
+    }
+  }
+  showOverlay(true);
+  $api.list().then(function(personajes){
+    populatelist(personajes);
+    showOverlay(false);
+  });
 }

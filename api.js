@@ -20,8 +20,13 @@ var api = function(){
     return $http.delete(url_api + '/' + id)
   }
 
+  function saveEntity(data){
+    return $http.post(url_api, data);
+  }
+
   return {
     list: getList,
-    remove: deleteEntity
+    remove: deleteEntity,
+    save: saveEntity
   }
 }
